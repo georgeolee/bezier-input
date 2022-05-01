@@ -8,6 +8,10 @@ Because bezier curves are parametric functions, `(x,y)` points along the curve d
 
 To get around this, the component interpolates a `y` value at evenly spaced increments of `x` using the two nearest sample points. This is handy for animation because it means each element of the output array represents an equal slice of time, but it does introduce some discrepancy between the output and the "real" y values along the curve. This is mostly noticeable at  very low sample sizes when the slope of the curve changes rapidly. For a closer approximation (or a really jagged line) you can pass a different `resolution` into the component.
 
+### Control Point Range
+
+0 to 1
+
 ### Output Range
 
 Output values are in the 0 - 1 range.
