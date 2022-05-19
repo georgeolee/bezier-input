@@ -33,8 +33,8 @@ export class CubicBezierCanvas{
         this.hoverPoint = null;
 
 
-        // resolution of canvas in proportion to computed css size
-        this.density = 2;
+        // match canvas pixel ratio to device
+        this.density = window.devicePixelRatio;
 
         this.curveStrokeWidth = 4 * this.density;
         this.controlStrokeWidth = 1.5 * this.density;
