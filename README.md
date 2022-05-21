@@ -8,6 +8,13 @@ Because bezier curves are parametric functions, `(x,y)` points along the curve d
 
 To get around this, the component interpolates a `y` value at evenly spaced increments of `x` using the two nearest sample points. This is handy for animation because it means each element of the output array represents an equal slice of time, but it does introduce some discrepancy between the output and the "real" y values along the curve. This is mostly noticeable at  very low sample sizes when the slope of the curve changes rapidly. For a closer approximation (or a really jagged line) you can pass a different `resolution` into the component.
 
+![bezier_comparison_compressed](https://user-images.githubusercontent.com/62530485/169634721-63925d24-38a2-4b42-864e-a6f092776711.gif)
+
+- blue: the rendered component appearance
+- red: sampled points along the curve at evenly spaced intervals of t
+- yellow: sampled y values, evenly distributed along the x axis
+- green: interpolated y values, to correct for x axis stretching
+
 ### Control Point Range
 
 0 to 1
