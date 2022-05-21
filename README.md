@@ -1,35 +1,41 @@
 # bezier-input
 
-A cubic bezier curve with handles for click-and-drag editing. It outputs an array of numbers, representing y coordinates along the curve, that can be used to control an arbitrary value. I've used it to animate properties like particle size and speed over time. More about that project [here](github.com/georgeolee/p-widge).
+A functional React component that renders a cubic bezier curve with control handles for click-and-drag editing. It passes an array of numbers, representing y coordinates along the curve, to a specified handler function. The handler function gets called after render and whenever the control points change. I've used it to animate properties like particle size and speed over time. More about that project [here](github.com/georgeolee/p-widge).
 
 ### Lookup Interpolation
 
-Because bezier curves are parametric functions, `(x,y)` points along the curve depend on an independent variable `t`. Evenly stepped values for `t` don't necessarily imply the same for `x`. This makes something like animation using the raw sample values a little tricky, because each sample represents a different step size for `x` — or a different length of time, in the context of animation.
+Bezier curves are parametric functions, meaning both x and y values along the curve depend on an independent variable t. The exact relationship between t and x depends on the control points used to define the curve. You can see this in the red graph, where regular intervals of t yield different increments of x as the control points change.
 
-To get around this, the component interpolates a `y` value at evenly spaced increments of `x` using the two nearest sample points. This is handy for animation because it means each element of the output array represents an equal slice of time, but it does introduce some discrepancy between the output and the "real" y values along the curve. This is mostly noticeable at  very low sample sizes when the slope of the curve changes rapidly. For a closer approximation (or a really jagged line) you can pass a different `resolution` into the component.
+In the context of animation, this means the length of time represented by each sample is not a uniform quantity. Attempting to use the sampled Y values without taking the varying x intervals into account results in a curve that has the same overall highs and lows as the original but appears squashed and stretched in the x axis. You can see this in the yellow graph.
+
+To maintain the overall shape of the original curve, the component interpolates an approximate y value at regular intervals using the two nearest sample points. This allows handler functions to treat each array index as a constant unit, which is convenient — the tradeoff is some jaggedness, which you can see in the green graph.
+
+You can adjust the fidelity of the lookup array by passing in a different resolution to the component. The example here has resolution set to 12 (the default is 64 samples).
+
 
 ![bezier_comparison_compressed](https://user-images.githubusercontent.com/62530485/169634721-63925d24-38a2-4b42-864e-a6f092776711.gif)
 
 - blue: the rendered component appearance
 - red: sampled points along the curve at evenly spaced intervals of t
 - yellow: sampled y values, evenly distributed along the x axis
-- green: interpolated y values, to correct for x axis stretching
+- green: interpolated y values, to correct for x axis stretching; this is what gets passed to the handler function
 
-### Control Point Range
+### Constraints
 
-0 to 1
+To keep the curve from failing the [vertical line test](https://en.wikipedia.org/wiki/Vertical_line_test), control points P0 and P3 are restricted to  x = 0 and x = 1, respectively. All four control points have their x and y coordinates clamped to the 0 - 1 range. If the initial control points passed in cross outside of this range, they are normalized to fit.
+
 
 ### Output Range
 
 Output values are in the 0 - 1 range.
 
-### props
+### Props
 
 `resolution` – the number of lookup values to output\
 `func` – a function to handle the lookup array\
 `points` – the initial control point coordinates ; 8 numbers or 4 (x, y) vector objects\
 `labelTop` `labelX` `labelY` - graph title and axis labels
 
-### styling
+### Canvas Dimensions And Styling
 
-The bezier curve and control elements are drawn using the Canvas API. To keep all the styling in one place, most of the canvas color values are set from custom CSS properties after the component renders.
+The bezier curve and control elements are drawn with the Canvas API. To keep most of the styling in one place, canvas drawing colors and control size, as well as the height and width attributes of the canvas, are set from custom CSS properties after the component renders. A ResizeObserver recomputes canvas size attributes and control point size if the canvas element or document root are resized.
