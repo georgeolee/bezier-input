@@ -2,6 +2,9 @@
 
 A functional React component that renders a cubic bezier curve with control handles for click-and-drag editing. It passes an array of numbers, representing y coordinates along the curve, to a specified handler function. The handler function gets called after render and whenever the control points change. I've used it to animate properties like particle size and speed over time. More about that project [here](github.com/georgeolee/p-widge).
 
+![bezier-output](https://user-images.githubusercontent.com/62530485/169880265-a6972892-68af-4e2b-96ab-c6d74fdc8355.gif)
+
+
 ### Lookup Interpolation
 
 Bezier curves are parametric functions, meaning both x and y values along the curve depend on an independent variable t. The exact relationship between t and x depends on the control points used to define the curve. You can see this in the red graph, where regular intervals of t yield different increments of x as the control points change.
