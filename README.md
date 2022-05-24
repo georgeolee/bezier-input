@@ -7,13 +7,23 @@ A functional React component that renders a cubic bezier curve with control hand
 
 ### Lookup Interpolation
 
-Bezier curves are parametric functions, meaning both x and y values along the curve depend on an independent variable t. The exact relationship between t and x depends on the control points used to define the curve. You can see this in the red graph, where regular intervals of t yield different increments of x as the control points change.
+Bezier curves are parametric functions. In most cases, the points obtained by sampling an arbitrary curve P(t) at regular intervals of t **(red)** will not be evenly distributed in the x axis. 
 
-In the context of animation, this means the length of time represented by each sample is not a uniform quantity. Attempting to use the sampled Y values without taking the varying x intervals into account results in a curve that has the same overall highs and lows as the original but appears squashed and stretched in the x axis. You can see this in the yellow graph.
+Using the sampled y values without accounting for this uneven horizontal distribution effectively creates a new curve **(yellow)** that has the same vertical range as the original but is squashed and stretched horizontally.
 
-To maintain the overall shape of the original curve, the component interpolates an approximate y value at regular intervals using the two nearest sample points. This allows handler functions to treat each array index as a constant unit, which is convenient — the tradeoff is some jaggedness, which you can see in the green graph.
+To simplify output handling, this component uses the original sample points to interpolate a new array of approximate y values **(green)** at regular x intervals along the curve. This is more convenient in a lot of cases – if you want to lerp through array values over time, say – because each index can be treated as a fixed unit of equal weight, without the need to consider variations in sample width.
 
-You can adjust the fidelity of the lookup array by passing in a different resolution to the component. The example here has resolution set to 12 (the default is 64 samples).
+There are a couple tradeoffs to this approach:
+
+#### Inaccuracy
+
+Except for the start and end points, sample values represent approximations rather than actual points along the curve. This is probably not a huge deal in the type of situation where you'd consider using a click and drag input.
+
+#### Information Loss
+
+This is probably the bigger tradeoff. You can see in the green graph areas where many tightly packed points from the original sampling get flattened out into a line. You can mitigate the effects of undersampling by passing in a higher resolution to the component if needed. 
+
+(12 samples are shown here for clarity, but the default resolution is 64.)
 
 
 ![bezier_comparison_compressed](https://user-images.githubusercontent.com/62530485/169634721-63925d24-38a2-4b42-864e-a6f092776711.gif)
@@ -39,6 +49,6 @@ Output values are in the 0 - 1 range.
 `points` – the initial control point coordinates ; 8 numbers or 4 (x, y) vector objects\
 `labelTop` `labelX` `labelY` - graph title and axis labels
 
-### Canvas Dimensions And Styling
+### Canvas Styling
 
-The bezier curve and control elements are drawn with the Canvas API. To keep most of the styling in one place, canvas drawing colors and control size, as well as the height and width attributes of the canvas, are set from custom CSS properties after the component renders. A ResizeObserver recomputes canvas size attributes and control point size if the canvas element or document root are resized.
+The bezier curve and control elements are drawn with the Canvas API. To keep styling in one place, canvas drawing colors and control point size are set from custom CSS properties after the component renders. 
