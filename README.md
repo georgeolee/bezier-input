@@ -2,7 +2,7 @@
 
 A cubic Bezier component with interactive control points. It generates a lookup table for the  current curve and updates it as you move the points around.  You can set an `onChange` function to handle the lookup data. 
 
-The lookup table is just a standard javascript array of numbers, representing the height of the curve at different points along the x axis. The entries go from left to right across the width of the graph. The default number of lookup entries is 64, but it can be set explicitly via the `resolution` prop.
+The lookup table is just a standard javascript array of numbers, representing the height of the curve at regular intervals along the x axis. The entries go from left to right across the width of the graph. The default number of lookup entries is 64, but it can be set explicitly via the `resolution` prop.
 
 ![bezier-output](https://user-images.githubusercontent.com/62530485/169880265-a6972892-68af-4e2b-96ab-c6d74fdc8355.gif)
 
