@@ -1,30 +1,29 @@
 # bezier-input-react
 
-A cubic Bezier component with interactive control points. It generates a lookup table for the  current curve and updates it as you move the points around.  You can set an `onChange` function to handle the lookup data. 
+A cubic Bezier component with interactive control points. When the user moves a point, the component creates a lookup table for the new curve and passes it to an `onChange` handler. 
 
-The lookup table is just a standard javascript array of numbers, representing the height of the curve at regular intervals along the x axis. The entries go from left to right across the width of the graph. The default number of lookup entries is 64, but it can be set explicitly via the `resolution` prop.
+The lookup table is just a standard javascript array of numbers, representing the approximate height of the curve at regular intervals across the width of the graph. The default lookup `resolution` is 64 entries. More details below.
 
 ![bezier-output](https://user-images.githubusercontent.com/62530485/169880265-a6972892-68af-4e2b-96ab-c6d74fdc8355.gif)
 
 
 ### Lookup Interpolation
 
-Lookup values (green in the GIF below) are interpolated from an initial sampling of points on the curve (red). 
-
-The sample points don't have a fixed horizontal spacing because Bezier curve equations are parametric and the control points are constantly shifting. 
-
-The interpolated values, however, can be calculated at regular intervals along the x axis. This makes the interpolated curve easier to work with, because you can throw out one set of coordinate data and just traverse the curve horizontally by index.
-
-There's an accuracy tradeoff here, but it is a slider-style input after all :slightly_smiling_face:. You can bump up `resolution` if your curve is looking too jagged.
-
 ![bezier_comparison_compressed](https://user-images.githubusercontent.com/62530485/169634721-63925d24-38a2-4b42-864e-a6f092776711.gif)
 
-*Comparison of sampled points (x and y), sampled y values, and interpolated y values – shown here at 12 resolution*
+Bezier curves are written as parametric equations. This makes it hard to get y in terms of some arbitrary x, even though this is almost always how we think about using a curve as a control input. Throw moving control points into the mix and it's even more of a mess because the Bezier equations keep changing.
 
+To create a useful curve representation for looking up values by x, the component uses an initial sample set (the red graph) to interpolate values for y at regular x intervals (the green graph). This means the curve can be represented as a simple 1D array of y values. 
+
+With a constant step size for x, reproducing the curve is as easy as looping through the array, and looking up y in terms of x is straightforward. Each index represents an x increment of `1 / (resolution - 1)`. 
+
+There's some accuracy loss with to this approach, but it should work well enough for a slider-style input. You can bump up `resolution` to get a closer approximation as needed – the example here is intentionally crunchy for clarity :slightly_smiling_face:
 
 ### Control Point Constraints
 
-You can set initial control points other than the default ones as long as they fit the following constraints:
+You can set initial control points other than the default ones as long as they fit the constraints below. The graph area spans from (0, 0) in the bottom left to (1, 1) in the top right. If any coordinate falls outside the permitted range for some reason, the component will try to scale/translate the curve to fit the graph area. 
+
+Note that P<sub>0</sub> and P<sub>3</sub> are drawn slightly differently to avoid obscuring the ends of the curve, so they won't appear to line up with P<sub>1</sub>/P<sub>2</sub> even when their coordinates are identical. This difference is visual only.
 
 | point | x | y | default |
 | --- | --- | --- | --- |
@@ -32,8 +31,6 @@ You can set initial control points other than the default ones as long as they f
 | P<sub>1</sub> | 0 to 1 | 0 to 1 | (0, 1) |
 | P<sub>2</sub> | 0 to 1 | 0 to 1 | (1, 0) |
 | P<sub>3</sub> | 1 | 0 to 1 | (1, 1) |
-
-The points (0, 0) and (1, 1) correspond to the bottom left and top right corners of the graph, respectively. All ranges are inclusive. If any coordinate falls outside the permitted range for some reason, the component will attempt to scale/translate the curve to fit the graph area.
 
 ### Props
 
