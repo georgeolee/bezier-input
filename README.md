@@ -2,7 +2,9 @@
 
 A cubic Bezier component with interactive control points. When the user moves a point, the component creates a lookup table for the new curve and passes it to an `onChange` handler. 
 
-The lookup table is just a standard javascript array of numbers, representing the approximate height of the curve at regular intervals across the width of the graph. The default lookup `resolution` is 64 entries. More details below.
+The lookup table is just a standard javascript array of numbers, representing the height of the curve at regular intervals across the width of the graph. The default lookup `resolution` is 64 entries. 
+
+Note that values are approximate – my original use case was controlling instance properties in a particle system, so accuracy took a backseat in favor of keeping computations simple. See details below.
 
 ![bezier-output](https://user-images.githubusercontent.com/62530485/169880265-a6972892-68af-4e2b-96ab-c6d74fdc8355.gif)
 
@@ -11,13 +13,11 @@ The lookup table is just a standard javascript array of numbers, representing th
 
 ![bezier_comparison_compressed](https://user-images.githubusercontent.com/62530485/169634721-63925d24-38a2-4b42-864e-a6f092776711.gif)
 
-Bezier curves are written as parametric equations. This makes it hard to get y in terms of some arbitrary x, even though this is almost always how we think about using a curve as a control input. Throw moving control points into the mix and it's even more of a mess because the Bezier equations keep changing.
+Bezier curves are parametric, which is inconvenient for stuff like animation curves where you want x to be your independent variable. To get something a little closer to an f(x) representation, the component plugs a number of values for t into the Bezier equation and uses the resulting points to interpolate the value of y at regular x intervals. 
 
-To create a useful curve representation for looking up values by x, the component uses an initial sample set (the red graph) to interpolate values for y at regular x intervals (the green graph). This means the curve can be represented as a simple 1D array of y values. 
+This lets us represent the curve with a simple 1D array of `resolution` y values for 0 $\le$ x $\le$ 1. Looking up y in terms of x is straightforward because the x increment between indices stays a constant `1 / (resolution - 1)` even as the control points change.
 
-With a constant step size for x, reproducing the curve is as easy as looping through the array, and looking up y in terms of x is straightforward. Each index represents an x increment of `1 / (resolution - 1)`. 
-
-There's some accuracy loss with to this approach, but it should work well enough for a slider-style input. You can bump up `resolution` to get a closer approximation as needed – the example here is intentionally crunchy for clarity :slightly_smiling_face:
+It's not a perfectly accurate solution, but it should work well enough for a slider-style input. You can bump up `resolution` to get a more accurate approximation. The example above uses a crunchy 12 just for clarity :slightly_smiling_face:.
 
 ### Control Point Constraints
 
